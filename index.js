@@ -107,13 +107,6 @@ export default function runAll(nodes) {
         });
       });
 
-      messages.forEach((msgs, i) => {
-        expect(msgs.length).to.gte(
-          nodes.length - 1,
-          `Unexpected number of messages received by ${hostnames[i]}`
-        );
-      });
-
       // Checking that message sent by waku[i]
       for (let i = 0; i < wakus.length; i++) {
         // is received by waku[j]
@@ -190,13 +183,6 @@ export default function runAll(nodes) {
         });
       });
 
-      messages.forEach((msgs, i) => {
-        expect(msgs.length).to.gte(
-          nodes.length - 1,
-          `Unexpected number of messages received by ${hostnames[i]}`
-        );
-      });
-
       // Checking that message sent by waku[i]
       for (let i = 0; i < wakus.length; i++) {
         // is received by waku[j]
@@ -213,8 +199,6 @@ export default function runAll(nodes) {
 
     it("Retrieve from Store, sent via Light push", async function () {
       this.timeout(30000);
-
-      expect(nodes.length).to.eq(3);
 
       const id = uuidv4();
 
