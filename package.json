@@ -1,10 +1,12 @@
 {
   "name": "waku-tests",
   "packageManager": "yarn@3.2.0",
+  "type": "module",
   "scripts": {
     "lint": "eslint . --ext .js",
     "format": "prettier --write .",
-    "run": "mocha 'index.ts'"
+    "fix": "run-s lint format",
+    "run": "mocha 'index.js'"
   },
   "eslintConfig": {
     "env": {
@@ -25,17 +27,19 @@
     ".pnp.cjs",
     ".pnp.loader.mjs",
     ".yarnrc.yml",
-    ".yarn"
+    ".yarn",
+    "node_modules"
   ],
   "devDependencies": {
     "chai": "^4.3.6",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
     "mocha": "^9.2.2",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.6.2"
   },
   "dependencies": {
     "js-waku": "^0.20.0",
-    "multiaddr": "^10.0.1"
+    "uuid": "^8.3.2"
   }
 }

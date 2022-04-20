@@ -2,9 +2,14 @@ import { expect } from "chai";
 import { describe } from "mocha";
 import { Multiaddr } from "multiaddr";
 import { Protocols, Waku, WakuMessage } from "js-waku";
-import { fleets } from "js-waku/build/main/lib/discovery/predefined";
-import { randomBytes } from "js-waku/build/main/lib/crypto";
-import { delay } from "./delay";
+import { discovery } from "js-waku";
+import { v4 as uuidv4 } from "uuid";
+import delay from "./delay.js";
+
+const prodFleet =
+  discovery.predefined.fleets.fleets["wakuv2.prod"]["waku-websocket"];
+const testFleet =
+  discovery.predefined.fleets.fleets["wakuv2.test"]["waku-websocket"];
 
 describe("Test nwaku fleets", () => {
   describe("Prod Fleet", () => {
@@ -21,9 +26,7 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(20000);
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.prod"]["waku-websocket"]
-      );
+      const nodes = Object.values(prodFleet);
 
       const peerIds = nodes.map((a) => {
         const ma = new Multiaddr(a);
@@ -56,11 +59,9 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(60000);
 
-      const id = randomBytes(4).toString();
+      const id = uuidv4();
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.prod"]["waku-websocket"]
-      );
+      const nodes = Object.values(prodFleet);
 
       expect(nodes.length).to.eq(3);
 
@@ -123,11 +124,9 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(60000);
 
-      const id = randomBytes(4).toString();
+      const id = uuidv4();
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.prod"]["waku-websocket"]
-      );
+      const nodes = Object.values(prodFleet);
 
       expect(nodes.length).to.eq(3);
 
@@ -189,13 +188,11 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(30000);
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.prod"]["waku-websocket"]
-      );
+      const nodes = Object.values(prodFleet);
 
       expect(nodes.length).to.eq(3);
 
-      const id = randomBytes(4).toString();
+      const id = uuidv4();
 
       const promises = nodes.map(async (node, i) => {
         wakus[i] = await Waku.create({
@@ -250,9 +247,7 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(20000);
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.test"]["waku-websocket"]
-      );
+      const nodes = Object.values(testFleet);
 
       const peerIds = nodes.map((a) => {
         const ma = new Multiaddr(a);
@@ -283,11 +278,9 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(60000);
 
-      const id = randomBytes(4).toString();
+      const id = uuidv4();
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.test"]["waku-websocket"]
-      );
+      const nodes = Object.values(testFleet);
 
       expect(nodes.length).to.eq(3);
 
@@ -350,11 +343,9 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(60000);
 
-      const id = randomBytes(4).toString();
+      const id = uuidv4();
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.test"]["waku-websocket"]
-      );
+      const nodes = Object.values(testFleet);
 
       expect(nodes.length).to.eq(3);
 
@@ -416,13 +407,11 @@ describe("Test nwaku fleets", () => {
       // This dependence must be removed once DNS discovery is implemented
       this.timeout(30000);
 
-      const nodes = Object.values(
-        fleets.fleets["wakuv2.test"]["waku-websocket"]
-      );
+      const nodes = Object.values(testFleet);
 
       expect(nodes.length).to.eq(3);
 
-      const id = randomBytes(4).toString();
+      const id = uuidv4();
 
       const promises = nodes.map(async (node, i) => {
         wakus[i] = await Waku.create({
