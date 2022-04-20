@@ -1,0 +1,27 @@
+name: Run suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: 'Valid values are: predefined-prod, predefined-test, native-wss-prod'
+        required: true
+        default: 'native-wss-prod'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: npm install
+        uses: bahmutov/npm-install@v1
+
+      - name: Run
+        run: npm run ${{ github.event.inputs.script }}
