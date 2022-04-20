@@ -24,8 +24,10 @@ export default function runAll(nodes) {
         const ma = new Multiaddr(a);
         return ma.getPeerId();
       });
-
-      expect(nodes.length).to.eq(3);
+      const hostnames = nodes.map((a) => {
+        const ma = new Multiaddr(a);
+        return ma.nodeAddress().address;
+      });
 
       const promises = nodes.map(async (node, i) => {
         wakus[i] = await Waku.create({
@@ -38,7 +40,10 @@ export default function runAll(nodes) {
           });
         }).then((peerId) => {
           console.log("connected", peerId.toB58String());
-          expect(peerId.toB58String()).to.eq(peerIds[i]);
+          expect(peerId.toB58String()).to.eq(
+            peerIds[i],
+            `Could not connect to ${hostnames[i]}`
+          );
         });
       });
 
@@ -51,8 +56,6 @@ export default function runAll(nodes) {
       this.timeout(60000);
 
       const id = uuidv4();
-
-      expect(nodes.length).to.eq(3);
 
       const promises = nodes.map(async (node, i) => {
         wakus[i] = await Waku.create({
@@ -69,11 +72,16 @@ export default function runAll(nodes) {
       const contentTopic = `/waku-tests/1/relay-test-${id}/utf8`;
 
       const messages = [];
+      const hostnames = nodes.map((a) => {
+        const ma = new Multiaddr(a);
+        return ma.nodeAddress().address;
+      });
 
-      wakus.forEach((waku) => {
+      wakus.forEach((waku, i) => {
+        messages[i] = [];
         waku.relay.addObserver(
           (message) => {
-            messages.push({
+            messages[i].push({
               msg: message.payloadAsUtf8,
               timestamp: message.timestamp,
               rcvd: new Date(),
@@ -85,7 +93,7 @@ export default function runAll(nodes) {
 
       const relayPromises = wakus.map(async (waku, i) => {
         const msg = await WakuMessage.fromUtf8String(
-          `sent via ${nodes[i]} - ${id}`,
+          `sent via ${hostnames[i]} - ${id}`,
           contentTopic
         );
         return waku.relay.send(msg);
@@ -96,15 +104,31 @@ export default function runAll(nodes) {
 
       console.log(messages);
 
-      messages.forEach((msg) => {
-        const diff = msg.rcvd.getTime() - msg.timestamp.getTime();
-        console.log(msg.timestamp, msg.rcvd, diff + "ms");
+      messages.forEach((msgs) => {
+        msgs.forEach((msg) => {
+          const diff = msg.rcvd.getTime() - msg.timestamp.getTime();
+          console.log(msg.timestamp, msg.rcvd, diff + "ms");
+        });
       });
 
-      expect(messages.length).to.gte(nodes.length);
+      messages.forEach((msgs, i) => {
+        expect(msgs.length).to.eq(
+          nodes.length - 1,
+          `Unexpected number of messages received by ${hostnames[i]}`
+        );
+      });
 
+      // Checking that message sent by waku[i]
       for (let i = 0; i < wakus.length; i++) {
-        expect(messages.map((m) => m.msg)).to.contain(`sent via ${nodes[i]} - ${id}`);
+        // is received by waku[j]
+        for (let j = 0; j < wakus.length; j++) {
+          if (i === j) continue;
+
+          expect(messages[j].map((m) => m.msg)).to.contain(
+            `sent via ${hostnames[i]} - ${id}`,
+            `Node connected to ${hostnames[j]} did not receive message sent via ${hostnames[i]}`
+          );
+        }
       }
     });
 
@@ -166,7 +190,9 @@ export default function runAll(nodes) {
       expect(messages.length).to.gte(nodes.length);
 
       for (let i = 0; i < wakus.length; i++) {
-        expect(messages.map((m) => m.msg)).to.contain(`sent via ${nodes[i]} - ${id}`);
+        expect(messages.map((m) => m.msg)).to.contain(
+          `sent via ${nodes[i]} - ${id}`
+        );
       }
     });
 
