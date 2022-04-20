@@ -6,7 +6,8 @@
     "lint": "eslint . --ext .js",
     "format": "prettier --write .",
     "fix": "run-s lint format",
-    "run": "mocha 'index.js'"
+    "prod": "mocha prodFleet.js",
+    "test": "mocha testFleet.js"
   },
   "eslintConfig": {
     "env": {
