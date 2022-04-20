@@ -6,6 +6,6 @@ const prodFleet =
   discovery.predefined.fleets.fleets["wakuv2.prod"]["waku-websocket"];
 const nodes = Object.values(prodFleet);
 
-describe("Prod Fleet", async () => {
-  await runAll(nodes);
+describe("Predefined Prod Fleet", () => {
+  runAll(nodes);
 });

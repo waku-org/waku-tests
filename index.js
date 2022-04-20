@@ -66,7 +66,7 @@ export default function runAll(nodes) {
       await Promise.all(promises);
       // All connected and relay ready
 
-      const contentTopic = "/js-waku-testing/1/relay-test/utf8";
+      const contentTopic = `/waku-tests/1/relay-test-${id}/utf8`;
 
       const messages = [];
 
@@ -85,7 +85,7 @@ export default function runAll(nodes) {
 
       const relayPromises = wakus.map(async (waku, i) => {
         const msg = await WakuMessage.fromUtf8String(
-          `sent from ${i} - ${id}`,
+          `sent via ${nodes[i]} - ${id}`,
           contentTopic
         );
         return waku.relay.send(msg);
@@ -104,7 +104,7 @@ export default function runAll(nodes) {
       expect(messages.length).to.gte(nodes.length);
 
       for (let i = 0; i < wakus.length; i++) {
-        expect(messages.map((m) => m.msg)).to.contain(`sent from ${i} - ${id}`);
+        expect(messages.map((m) => m.msg)).to.contain(`sent via ${nodes[i]} - ${id}`);
       }
     });
 
@@ -129,7 +129,7 @@ export default function runAll(nodes) {
       await Promise.all(promises);
       // All connected and relay ready
 
-      const contentTopic = "/js-waku-testing/1/relay-test/utf8";
+      const contentTopic = `/waku-tests/1/light-push-${id}/utf8`;
 
       const messages = [];
 
@@ -148,7 +148,7 @@ export default function runAll(nodes) {
 
       const relayPromises = wakus.map(async (waku, i) => {
         const msg = await WakuMessage.fromUtf8String(
-          `sent from ${i} - ${id}`,
+          `sent via ${nodes[i]} - ${id}`,
           contentTopic
         );
         return waku.lightPush.push(msg);
@@ -166,7 +166,7 @@ export default function runAll(nodes) {
       expect(messages.length).to.gte(nodes.length);
 
       for (let i = 0; i < wakus.length; i++) {
-        expect(messages.map((m) => m.msg)).to.contain(`sent from ${i} - ${id}`);
+        expect(messages.map((m) => m.msg)).to.contain(`sent via ${nodes[i]} - ${id}`);
       }
     });
 
@@ -191,11 +191,11 @@ export default function runAll(nodes) {
       await Promise.all(promises);
       // All connected and relay ready
 
-      const contentTopic = "/js-waku-testing/1/store-test/utf8";
+      const contentTopic = `/waku-tests/1/store-test-${id}/utf8`;
 
       const relayPromises = wakus.map(async (waku, i) => {
         const msg = await WakuMessage.fromUtf8String(
-          `sent from ${i} - ${id}`,
+          `sent via ${nodes[i]} - ${id}`,
           contentTopic
         );
         return waku.relay.send(msg);
@@ -210,7 +210,7 @@ export default function runAll(nodes) {
         console.log(index, payloads);
 
         for (let i = 0; i < wakus.length; i++) {
-          expect(payloads).to.contain(`sent from ${i} - ${id}`);
+          expect(payloads).to.contain(`sent via ${nodes[i]} - ${id}`);
         }
       });
 

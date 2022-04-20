@@ -6,8 +6,9 @@
     "lint": "eslint . --ext .js",
     "format": "prettier --write .",
     "fix": "run-s lint format",
-    "prod": "mocha prodFleet.js",
-    "test": "mocha testFleet.js"
+    "predefined-prod": "mocha predefinedProdFleet.js --exit",
+    "predefined-test": "mocha predefinedTestFleet.js --exit ",
+    "native-wss": "mocha nativeWssProdFleet.js --exit"
   },
   "eslintConfig": {
     "env": {
