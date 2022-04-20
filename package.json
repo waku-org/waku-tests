@@ -8,7 +8,8 @@
     "fix": "run-s lint format",
     "predefined-prod": "mocha predefinedProdFleet.js --exit",
     "predefined-test": "mocha predefinedTestFleet.js --exit ",
-    "native-wss-prod": "mocha nativeWssProdFleet.js --exit"
+    "native-wss-prod": "mocha nativeWssProdFleet.js --exit",
+    "waku-connect": "mocha wakuConnectFleet.js --exit"
   },
   "eslintConfig": {
     "env": {
