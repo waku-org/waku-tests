@@ -16,8 +16,6 @@ export default function runAll(nodes) {
     });
 
     it("Connect", async function () {
-      // This test depends on fleets.status.im being online.
-      // This dependence must be removed once DNS discovery is implemented
       this.timeout(20000);
 
       const peerIds = nodes.map((a) => {
@@ -51,8 +49,6 @@ export default function runAll(nodes) {
     });
 
     it("Relay", async function () {
-      // This test depends on fleets.status.im being online.
-      // This dependence must be removed once DNS discovery is implemented
       this.timeout(60000);
 
       const id = uuidv4();
@@ -112,7 +108,7 @@ export default function runAll(nodes) {
       });
 
       messages.forEach((msgs, i) => {
-        expect(msgs.length).to.eq(
+        expect(msgs.length).to.gte(
           nodes.length - 1,
           `Unexpected number of messages received by ${hostnames[i]}`
         );
@@ -132,21 +128,20 @@ export default function runAll(nodes) {
       }
     });
 
-    it("Light Push", async function () {
-      // This test depends on fleets.status.im being online.
-      // This dependence must be removed once DNS discovery is implemented
+    it("Send via Light Push, receive via Relay", async function () {
       this.timeout(60000);
 
       const id = uuidv4();
-
-      expect(nodes.length).to.eq(3);
 
       const promises = nodes.map(async (node, i) => {
         wakus[i] = await Waku.create({
           bootstrap: { peers: [node] },
         });
 
-        await wakus[i].waitForRemotePeer([Protocols.LightPush]);
+        await wakus[i].waitForRemotePeer([
+          Protocols.LightPush,
+          Protocols.Relay,
+        ]);
         console.log(node + ": ready");
       });
 
@@ -156,11 +151,16 @@ export default function runAll(nodes) {
       const contentTopic = `/waku-tests/1/light-push-${id}/utf8`;
 
       const messages = [];
+      const hostnames = nodes.map((a) => {
+        const ma = new Multiaddr(a);
+        return ma.nodeAddress().address;
+      });
 
-      wakus.forEach((waku) => {
+      wakus.forEach((waku, i) => {
+        messages[i] = [];
         waku.relay.addObserver(
           (message) => {
-            messages.push({
+            messages[i].push({
               msg: message.payloadAsUtf8,
               timestamp: message.timestamp,
               rcvd: new Date(),
@@ -172,33 +172,46 @@ export default function runAll(nodes) {
 
       const relayPromises = wakus.map(async (waku, i) => {
         const msg = await WakuMessage.fromUtf8String(
-          `sent via ${nodes[i]} - ${id}`,
+          `sent via ${hostnames[i]} - ${id}`,
           contentTopic
         );
         return waku.lightPush.push(msg);
       });
 
       await Promise.all(relayPromises);
+      await delay(30000);
 
       console.log(messages);
 
-      messages.forEach((msg) => {
-        const diff = msg.rcvd.getTime() - msg.timestamp.getTime();
-        console.log(msg.timestamp, msg.rcvd, diff + "ms");
+      messages.forEach((msgs) => {
+        msgs.forEach((msg) => {
+          const diff = msg.rcvd.getTime() - msg.timestamp.getTime();
+          console.log(msg.timestamp, msg.rcvd, diff + "ms");
+        });
       });
 
-      expect(messages.length).to.gte(nodes.length);
-
-      for (let i = 0; i < wakus.length; i++) {
-        expect(messages.map((m) => m.msg)).to.contain(
-          `sent via ${nodes[i]} - ${id}`
+      messages.forEach((msgs, i) => {
+        expect(msgs.length).to.gte(
+          nodes.length - 1,
+          `Unexpected number of messages received by ${hostnames[i]}`
         );
+      });
+
+      // Checking that message sent by waku[i]
+      for (let i = 0; i < wakus.length; i++) {
+        // is received by waku[j]
+        for (let j = 0; j < wakus.length; j++) {
+          if (i === j) continue;
+
+          expect(messages[j].map((m) => m.msg)).to.contain(
+            `sent via ${hostnames[i]} - ${id}`,
+            `Node connected to ${hostnames[j]} did not receive message sent via ${hostnames[i]}`
+          );
+        }
       }
     });
 
-    it("Store", async function () {
-      // This test depends on fleets.status.im being online.
-      // This dependence must be removed once DNS discovery is implemented
+    it("Retrieve from Store, sent via Light push", async function () {
       this.timeout(30000);
 
       expect(nodes.length).to.eq(3);
@@ -210,24 +223,29 @@ export default function runAll(nodes) {
           bootstrap: { peers: [node] },
         });
 
-        await wakus[i].waitForRemotePeer([Protocols.Relay]);
+        await wakus[i].waitForRemotePeer([Protocols.Relay, Protocols.Store]);
         console.log(node + ": ready");
       });
 
       await Promise.all(promises);
       // All connected and relay ready
 
+      const hostnames = nodes.map((a) => {
+        const ma = new Multiaddr(a);
+        return ma.nodeAddress().address;
+      });
+
       const contentTopic = `/waku-tests/1/store-test-${id}/utf8`;
 
-      const relayPromises = wakus.map(async (waku, i) => {
+      const pushPromises = wakus.map(async (waku, i) => {
         const msg = await WakuMessage.fromUtf8String(
           `sent via ${nodes[i]} - ${id}`,
           contentTopic
         );
-        return waku.relay.send(msg);
+        return waku.lightPush.push(msg);
       });
 
-      await Promise.all(relayPromises);
+      await Promise.all(pushPromises);
       await delay(5000);
 
       const storePromises = wakus.map(async (waku, index) => {
@@ -236,7 +254,10 @@ export default function runAll(nodes) {
         console.log(index, payloads);
 
         for (let i = 0; i < wakus.length; i++) {
-          expect(payloads).to.contain(`sent via ${nodes[i]} - ${id}`);
+          expect(payloads).to.contain(
+            `sent via ${nodes[i]} - ${id}`,
+            `Store ${hostnames[index]} did not contain message sent via ${hostnames[i]}`
+          );
         }
       });
 
