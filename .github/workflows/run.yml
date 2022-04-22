@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       script:
-        description: "Valid values are: predefined-prod, predefined-test, native-wss-prod, waku-connect"
+        description: "Valid values are: predefined-prod, predefined-test, native-wss-prod, native-wss-test, waku-connect"
         required: true
         default: "native-wss-prod"
 
