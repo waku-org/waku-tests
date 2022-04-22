@@ -9,6 +9,7 @@
     "predefined-prod": "mocha predefinedProdFleet.js --exit",
     "predefined-test": "mocha predefinedTestFleet.js --exit ",
     "native-wss-prod": "mocha nativeWssProdFleet.js --exit",
+    "native-wss-test": "mocha nativeWssTestFleet.js --exit",
     "waku-connect": "mocha wakuConnectFleet.js --exit"
   },
   "eslintConfig": {
