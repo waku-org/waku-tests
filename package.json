@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.2.0",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --ext .js",
+    "lint": "eslint . --ext .js --fix",
     "format": "prettier --write .",
     "fix": "run-s lint format",
     "predefined-prod": "mocha predefinedProdFleet.js --exit",
