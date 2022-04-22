@@ -12,6 +12,9 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - name: Print input
+        run: echo "::notice title=${{ github.event.inputs.script }}::''"
+
       - name: Checkout code
         uses: actions/checkout@v2.3.3
 
