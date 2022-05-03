@@ -92,7 +92,9 @@ export default function runAll(nodes) {
           `sent via ${hostnames[i]} - ${id}`,
           contentTopic
         );
-        return waku.relay.send(msg);
+        // Wait 1 ms to be sure that no two messages have the same timestamp.
+        // Timestamp are in milliseconds in js-waku.
+        return delay(1).then(() => waku.relay.send(msg));
       });
 
       await Promise.all(relayPromises);
@@ -168,7 +170,9 @@ export default function runAll(nodes) {
           `sent via ${hostnames[i]} - ${id}`,
           contentTopic
         );
-        return waku.lightPush.push(msg);
+        // Wait 1 ms to be sure that no two messages have the same timestamp.
+        // Timestamp are in milliseconds in js-waku.
+        return delay(1).then(() => waku.lightPush.push(msg));
       });
 
       await Promise.all(relayPromises);
@@ -226,7 +230,9 @@ export default function runAll(nodes) {
           `sent via ${nodes[i]} - ${id}`,
           contentTopic
         );
-        return waku.lightPush.push(msg);
+        // Wait 1 ms to be sure that no two messages have the same timestamp.
+        // Timestamp are in milliseconds in js-waku.
+        return delay(1).then(() => waku.lightPush.push(msg));
       });
 
       await Promise.all(pushPromises);
