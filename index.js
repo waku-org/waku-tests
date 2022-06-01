@@ -63,6 +63,7 @@ export default function runAll(nodes) {
       });
 
       await Promise.all(promises);
+      await delay(5000);
       // All connected and relay ready
 
       const contentTopic = `/waku-tests/1/relay-test-${id}/utf8`;
@@ -139,6 +140,7 @@ export default function runAll(nodes) {
       });
 
       await Promise.all(promises);
+      await delay(5000);
       // All connected and relay ready
 
       const contentTopic = `/waku-tests/1/light-push-${id}/utf8`;
@@ -212,6 +214,7 @@ export default function runAll(nodes) {
       });
 
       await Promise.all(promises);
+      await delay(5000);
       // All connected and relay ready
 
       const hostnames = nodes.map((a) => {
