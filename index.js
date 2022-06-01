@@ -97,7 +97,7 @@ export default function runAll(nodes) {
       });
 
       await Promise.all(relayPromises);
-      await delay(5000);
+      await delay(30000);
 
       console.log(messages);
 
@@ -174,7 +174,7 @@ export default function runAll(nodes) {
       });
 
       await Promise.all(relayPromises);
-      await delay(5000);
+      await delay(30000);
 
       console.log(messages);
 
