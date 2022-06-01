@@ -1,9 +1,11 @@
 import { expect } from "chai";
 import { describe } from "mocha";
 import { Multiaddr } from "multiaddr";
-import { Protocols, Waku, WakuMessage } from "js-waku";
+import waku from "@waku/staging";
 import { v4 as uuidv4 } from "uuid";
 import delay from "./delay.js";
+
+const { Protocols, Waku, WakuMessage } = waku;
 
 export default function runAll(nodes) {
   describe("Run Waku Test Suite", () => {

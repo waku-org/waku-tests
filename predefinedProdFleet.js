@@ -1,5 +1,5 @@
 import { describe } from "mocha";
-import { discovery } from "js-waku";
+import { discovery } from "@waku/staging";
 import runAll from "./index.js";
 
 const prodFleet =
