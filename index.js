@@ -1,9 +1,12 @@
 import { expect } from "chai";
 import { describe } from "mocha";
 import { Multiaddr } from "multiaddr";
-import { Protocols, Waku, WakuMessage } from "js-waku";
+import { Protocols, WakuMessage } from "js-waku";
+import { createWaku } from "js-waku/lib/create_waku";
 import { v4 as uuidv4 } from "uuid";
 import delay from "./delay.js";
+import { PeerDiscoveryStaticPeers } from "js-waku/lib/peer_discovery_static_list";
+import { waitForRemotePeer } from "js-waku/lib/wait_for_remote_peer";
 
 export default function runAll(nodes) {
   describe("Run Waku Test Suite", () => {
@@ -28,17 +31,24 @@ export default function runAll(nodes) {
       });
 
       const promises = nodes.map(async (node, i) => {
-        wakus[i] = await Waku.create({
-          bootstrap: { peers: [node] },
+        wakus[i] = await createWaku({
+          libp2p: {
+            peerDiscovery: [new PeerDiscoveryStaticPeers([node])],
+          },
         });
 
+        await wakus[i].start();
+
         return new Promise((resolve) => {
-          wakus[i].libp2p.connectionManager.on("peer:connect", (connection) => {
-            resolve(connection.remotePeer);
-          });
+          wakus[i].libp2p.connectionManager.addEventListener(
+            "peer:connect",
+            (evt) => {
+              resolve(evt.detail.remotePeer);
+            }
+          );
         }).then((peerId) => {
-          console.log("connected", peerId.toB58String());
-          expect(peerId.toB58String()).to.eq(
+          console.log("connected", peerId.toString());
+          expect(peerId.toString()).to.eq(
             peerIds[i],
             `Could not connect to ${hostnames[i]}`
           );
@@ -54,11 +64,14 @@ export default function runAll(nodes) {
       const id = uuidv4();
 
       const promises = nodes.map(async (node, i) => {
-        wakus[i] = await Waku.create({
-          bootstrap: { peers: [node] },
+        wakus[i] = await createWaku({
+          libp2p: {
+            peerDiscovery: [new PeerDiscoveryStaticPeers([node])],
+          },
         });
 
-        await wakus[i].waitForRemotePeer([Protocols.Relay]);
+        await wakus[i].start();
+        await waitForRemotePeer(wakus[i], [Protocols.Relay]);
         console.log(node + ": ready");
       });
 
@@ -127,11 +140,14 @@ export default function runAll(nodes) {
       const id = uuidv4();
 
       const promises = nodes.map(async (node, i) => {
-        wakus[i] = await Waku.create({
-          bootstrap: { peers: [node] },
+        wakus[i] = await createWaku({
+          libp2p: {
+            peerDiscovery: [new PeerDiscoveryStaticPeers([node])],
+          },
         });
 
-        await wakus[i].waitForRemotePeer([
+        await wakus[i].start();
+        await waitForRemotePeer(wakus[i], [
           Protocols.LightPush,
           Protocols.Relay,
         ]);
@@ -203,11 +219,14 @@ export default function runAll(nodes) {
       const id = uuidv4();
 
       const promises = nodes.map(async (node, i) => {
-        wakus[i] = await Waku.create({
-          bootstrap: { peers: [node] },
+        wakus[i] = await createWaku({
+          libp2p: {
+            peerDiscovery: [new PeerDiscoveryStaticPeers([node])],
+          },
         });
 
-        await wakus[i].waitForRemotePeer([Protocols.Relay, Protocols.Store]);
+        await wakus[i].start();
+        await waitForRemotePeer(wakus[i], [Protocols.Relay, Protocols.Store]);
         console.log(node + ": ready");
       });
 

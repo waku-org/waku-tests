@@ -1,9 +1,8 @@
 import { describe } from "mocha";
-import { discovery } from "js-waku";
+import { fleets } from "js-waku/lib/predefined_bootstrap_nodes";
 import runAll from "./index.js";
 
-const testFleet =
-  discovery.predefined.fleets.fleets["wakuv2.test"]["waku-websocket"];
+const testFleet = fleets.fleets["wakuv2.test"]["waku-websocket"];
 const nodes = Object.values(testFleet);
 
 describe("Predefined Test Fleet", () => {

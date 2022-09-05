@@ -3,9 +3,12 @@
   "packageManager": "yarn@3.2.0",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --ext .js --fix",
-    "format": "prettier --write .",
-    "fix": "run-s lint format",
+    "fix": "run-s fix:**",
+    "fix:lint": "eslint . --ext .js --fix",
+    "fix:prettier": "prettier --write .",
+    "test": "run-s test:*",
+    "test:lint": "eslint . --ext .js",
+    "test:prettier": "prettier . --list-different",
     "predefined-prod": "mocha predefinedProdFleet.js --exit",
     "predefined-test": "mocha predefinedTestFleet.js --exit ",
     "native-wss-prod": "mocha nativeWssProdFleet.js --exit",
@@ -49,12 +52,12 @@
     "prettier": "^2.6.2"
   },
   "dependencies": {
-    "js-waku": "^0.20.0",
+    "js-waku": "^0.25.0",
     "multiaddr": "^10.0.1",
     "uuid": "^8.3.2"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
+    "*.{js,css,md,yml}": "prettier --write"
   }
 }
