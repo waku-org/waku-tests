@@ -49,7 +49,7 @@
     "prettier": "^2.6.2"
   },
   "dependencies": {
-    "js-waku": "^0.20.0",
+    "js-waku": "^0.25.0",
     "multiaddr": "^10.0.1",
     "uuid": "^8.3.2"
   },
